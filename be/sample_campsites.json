@@ -1,0 +1,424 @@
+[
+  {
+    "id": "camp_001",
+    "name": "Sunny Valley Campsite",
+    "location": {
+      "country": "Netherlands",
+      "region": "Friesland",
+      "city": "Leeuwarden",
+      "coordinates": {
+        "latitude": 53.1234,
+        "longitude": 5.7890
+      }
+    },
+    "facilities": {
+      "toilets": {
+        "count": 12,
+        "wheelchair_accessible": true,
+        "hot_showers": true,
+        "accessible_showers": 3
+      },
+      "water": {
+        "drinking_water": true,
+        "gray_water_disposal": true,
+        "tap_locations": 8,
+        "water_quality": "Excellent"
+      },
+      "electricity": {
+        "available": true,
+        "amps": 16,
+        "connection_points": 45,
+        "voltage": "230V"
+      },
+      "ev_charging": {
+        "available": true,
+        "charging_points": 3,
+        "charging_speed": "7kW",
+        "connector_types": ["Type 2", "CCS"]
+      }
+    },
+    "rules": {
+      "quiet_hours": {
+        "start": "22:00",
+        "end": "08:00"
+      },
+      "pets": {
+        "allowed": true,
+        "restrictions": "Well-behaved pets only. Additional €5/night",
+        "dog_park": true,
+        "dogs_allowed_in_facilities": false
+      },
+      "vehicles": {
+        "max_height": "3.5m",
+        "max_length": "7.5m",
+        "electric_vehicles": "Encouraged with dedicated charging",
+        "speed_limit": "5 km/h"
+      }
+    },
+    "reviews": [
+      {
+        "rating": 4.8,
+        "comment": "Excellent cleanliness. Staff very attentive to accessibility needs. Perfect for elderly guests.",
+        "verified": true,
+        "date": "2024-03-15"
+      },
+      {
+        "rating": 4.5,
+        "comment": "Food prices reasonable, but rides and slides cost extra. Fun for kids but budget accordingly.",
+        "verified": true,
+        "date": "2024-03-10"
+      },
+      {
+        "rating": 4.9,
+        "comment": "Perfect for families with elderly members. Ramps everywhere, accessible toilets very clean.",
+        "verified": true,
+        "date": "2024-02-28"
+      },
+      {
+        "rating": 4.7,
+        "comment": "EV charging works great. We charged our Tesla overnight without issues.",
+        "verified": true,
+        "date": "2024-02-20"
+      },
+      {
+        "rating": 4.7,
+        "comment": "I have observed wifi extra cost of 5€",
+        "verified": true,
+        "date": "2024-02-20"
+      }
+    ],
+    "accessibility": {
+      "wheelchair_accessible_pitches": 8,
+      "accessible_restaurants": true,
+      "accessible_toilets": true,
+      "accessible_showers": true,
+      "ramps": "All main areas",
+      "disabled_parking": 6,
+      "accessible_paths": "Paved throughout campsite",
+      "elevator_to_main_building": true,
+      "mobility_scooter_friendly": true
+    },
+    "amenities": {
+      "restaurants": 2,
+      "shops": 1,
+      "swimming_pool": true,
+      "indoor_pool": false,
+      "playground": true,
+      "wifi": true,
+      "wifi_speed": "50 Mbps",
+      "kids_club": true,
+      "entertainment": "Evening shows 3x per week"
+    },
+    "extra_costs": {
+      "wifi": "€2.50/day",
+      "pool_entry": "€3/person (kids free)",
+      "kids_activities": "€5-10 per activity",
+      "slides": "€1.50 per slide",
+      "parking": "Included"
+    },
+    "proximity": {
+      "nearest_city": "Leeuwarden (8km)",
+      "nearest_beach": "20km",
+      "grocery_store": "1.5km",
+      "hospital": "5km"
+    }
+  },
+  {
+    "id": "camp_002",
+    "name": "Alpine Adventure Resort",
+    "location": {
+      "country": "Switzerland",
+      "region": "Valais",
+      "city": "Zermatt",
+      "coordinates": {
+        "latitude": 46.0207,
+        "longitude": 7.7491
+      }
+    },
+    "facilities": {
+      "toilets": {
+        "count": 8,
+        "wheelchair_accessible": false,
+        "hot_showers": true
+      },
+      "water": {
+        "drinking_water": true,
+        "gray_water_disposal": true,
+        "tap_locations": 6
+      },
+      "electricity": {
+        "available": true,
+        "amps": 10,
+        "connection_points": 20
+      },
+      "ev_charging": {
+        "available": false,
+        "note": "Nearest charging 12km away in Visp"
+      }
+    },
+    "rules": {
+      "quiet_hours": {
+        "start": "21:00",
+        "end": "07:00"
+      },
+      "pets": {
+        "allowed": true,
+        "restrictions": "Pets allowed but must be under control",
+        "dog_park": false
+      },
+      "vehicles": {
+        "max_height": "2.8m",
+        "max_length": "6.0m",
+        "note": "Alpine pass driving required. Winter chains mandatory Dec-Feb"
+      }
+    },
+    "reviews": [
+      {
+        "rating": 4.9,
+        "comment": "Breathtaking mountain views. Great base for hiking. Staff speaks English and German.",
+        "verified": true
+      },
+      {
+        "rating": 4.6,
+        "comment": "Terrain is hilly. Not suitable for wheelchairs or walkers. Beautiful but challenging.",
+        "verified": true
+      },
+      {
+        "rating": 4.8,
+        "comment": "Amazing for adventure seekers. Close to Matterhorn trails.",
+        "verified": true
+      }
+    ],
+    "accessibility": {
+      "wheelchair_accessible_pitches": 0,
+      "accessible_toilets": false,
+      "ramps": "None",
+      "accessible_restaurants": false,
+      "terrain_difficulty": "Hilly and steep"
+    },
+    "amenities": {
+      "restaurants": 1,
+      "shops": 0,
+      "swimming_pool": false,
+      "playground": false,
+      "wifi": false,
+      "mountain_guides": true,
+      "bike_rentals": true
+    },
+    "activities": {
+      "hiking": "Excellent - 100+ trails",
+      "mountain_biking": "Available",
+      "rock_climbing": "Classes available",
+      "skiing": "Winter only (December-February)"
+    },
+    "transportation": {
+      "access_by_car": "Limited - mountain pass",
+      "public_transport": "Zermatt shuttle bus (2km)",
+      "parking": "Limited parking near entrance"
+    }
+  },
+  {
+    "id": "camp_003",
+    "name": "Coastal Paradise Campground",
+    "location": {
+      "country": "Italy",
+      "region": "Tuscany",
+      "city": "Castiglione della Pescaia",
+      "coordinates": {
+        "latitude": 42.7485,
+        "longitude": 10.8715
+      }
+    },
+    "facilities": {
+      "toilets": {
+        "count": 15,
+        "wheelchair_accessible": true,
+        "hot_showers": true
+      },
+      "water": {
+        "drinking_water": true,
+        "gray_water_disposal": true,
+        "tap_locations": 12
+      },
+      "electricity": {
+        "available": true,
+        "amps": 16,
+        "connection_points": 60
+      },
+      "ev_charging": {
+        "available": true,
+        "charging_points": 5,
+        "charging_speed": "11kW"
+      }
+    },
+    "rules": {
+      "quiet_hours": {
+        "start": "23:00",
+        "end": "07:00"
+      },
+      "pets": {
+        "allowed": true,
+        "restrictions": "€3/night per pet",
+        "beach_access": "Pets on beach only in designated areas (May-September 8-10am)"
+      },
+      "vehicles": {
+        "max_height": "3.8m",
+        "max_length": "8.0m"
+      }
+    },
+    "reviews": [
+      {
+        "rating": 4.9,
+        "comment": "Beautiful beach location. Staff speaks multiple languages. Great Italian food.",
+        "verified": true
+      },
+      {
+        "rating": 4.7,
+        "comment": "Expensive but worth it. Swimming pool overlooks the sea.",
+        "verified": true
+      },
+      {
+        "rating": 4.8,
+        "comment": "Perfect for families. Kids love the beach access. Safe and clean.",
+        "verified": true
+      },
+      {
+        "rating": 4.6,
+        "comment": "Direct beach access is the highlight. EV charging works well.",
+        "verified": true
+      }
+    ],
+    "accessibility": {
+      "wheelchair_accessible_pitches": 12,
+      "beach_access": "Wheelchair ramps to beach",
+      "accessible_toilets": true,
+      "accessible_showers": true,
+      "accessible_restaurants": true,
+      "accessible_shops": true
+    },
+    "amenities": {
+      "restaurants": 3,
+      "shops": 2,
+      "swimming_pool": true,
+      "poolside_bar": true,
+      "beach_access": true,
+      "wifi": true,
+      "entertainment": "Daily activities, evening shows"
+    },
+    "beach_facilities": {
+      "sandy_beach": "200m private beach",
+      "beach_chairs": "Available for rent",
+      "water_sports": "Windsurfing, paddleboarding available",
+      "lifeguard": "During season (June-September)"
+    },
+    "dining": {
+      "restaurant_1": {
+        "name": "Trattoria Toscana",
+        "cuisine": "Italian",
+        "price_range": "€€€"
+      },
+      "restaurant_2": {
+        "name": "Pizzeria Sul Mare",
+        "cuisine": "Pizza",
+        "price_range": "€€"
+      },
+      "bar_snacks": "Light meals and drinks available"
+    }
+  },
+  {
+    "id": "camp_004",
+    "name": "Family Fun Forest Campsite",
+    "location": {
+      "country": "Germany",
+      "region": "Bavaria",
+      "city": "Füssen",
+      "coordinates": {
+        "latitude": 47.5502,
+        "longitude": 10.6808
+      }
+    },
+    "facilities": {
+      "toilets": {
+        "count": 10,
+        "wheelchair_accessible": true,
+        "hot_showers": true
+      },
+      "water": {
+        "drinking_water": true,
+        "gray_water_disposal": true,
+        "tap_locations": 8
+      },
+      "electricity": {
+        "available": true,
+        "amps": 16,
+        "connection_points": 35
+      },
+      "ev_charging": {
+        "available": true,
+        "charging_points": 2,
+        "charging_speed": "7kW"
+      }
+    },
+    "rules": {
+      "quiet_hours": {
+        "start": "22:00",
+        "end": "08:00"
+      },
+      "pets": {
+        "allowed": true,
+        "restrictions": "€4/night",
+        "dog_training": "Available on request"
+      },
+      "vehicles": {
+        "max_height": "3.5m",
+        "max_length": "7.5m"
+      }
+    },
+    "reviews": [
+      {
+        "rating": 4.8,
+        "comment": "Perfect for families! Kids loved the activities. Close to Neuschwanstein Castle.",
+        "verified": true
+      },
+      {
+        "rating": 4.7,
+        "comment": "Great amenities. Staff helpful. Food prices reasonable.",
+        "verified": true
+      },
+      {
+        "rating": 4.9,
+        "comment": "Beautiful Bavarian setting. Hiking trails right from campsite.",
+        "verified": true
+      }
+    ],
+    "accessibility": {
+      "wheelchair_accessible_pitches": 5,
+      "accessible_toilets": true,
+      "accessible_restaurants": true,
+      "ramps": "Main areas only"
+    },
+    "amenities": {
+      "restaurants": 2,
+      "shops": 1,
+      "swimming_pool": true,
+      "playground": true,
+      "animal_park": true,
+      "mini_golf": true,
+      "wifi": true,
+      "kids_club": true,
+      "entertainment": "Daily activities"
+    },
+    "activities_for_kids": {
+      "indoor_playground": true,
+      "outdoor_adventures": true,
+      "animal_encounters": "Goats, sheep, rabbits",
+      "crafts": "Daily craft sessions"
+    },
+    "nearby_attractions": {
+      "neuschwanstein_castle": "5km",
+      "hohenschwangau_castle": "6km",
+      "forggensee_lake": "8km",
+      "hiking_trails": "Direct access"
+    }
+  }
+]
