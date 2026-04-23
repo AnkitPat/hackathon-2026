@@ -1,8 +1,21 @@
-langchain>=0.1.0
-langchain-community>=0.0.30
-langchain-google-genai>=0.0.10
-google-generativeai>=0.3.0
-chromadb>=0.4.0
-streamlit>=1.28.0
-python-dotenv>=1.0.0
-pydantic>=2.0.0
+# Core LLM + RAG
+langchain==0.2.16
+langchain-core==0.2.38
+langchain-community==0.2.16
+langchain-google-genai==1.0.10
+
+# Vector DB
+chromadb==0.5.5
+
+# API (for exposing endpoint)
+fastapi==0.111.0
+uvicorn==0.30.0
+
+# HTTP (for weather/maps later)
+httpx==0.27.0
+
+# Env management
+python-dotenv==1.0.1
+
+# Optional (but useful)
+pydantic==2.7.4

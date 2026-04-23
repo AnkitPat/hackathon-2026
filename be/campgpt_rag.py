@@ -412,7 +412,7 @@ Answer:"""
                 search_type="similarity",
                 search_kwargs={"k": 5}  # Retrieve top 5 relevant chunks
             ),
-            return_source_documents="true",
+            return_source_documents=True,
             chain_type_kwargs={"prompt": PROMPT}
         )
         
