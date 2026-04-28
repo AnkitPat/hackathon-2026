@@ -1,3 +1,6 @@
+# python BE: https://hackathon-2026-xnok.onrender.com
+# cdn: https://d3rzchwrt70me2.cloudfront.net/
+
 """
 CampGPT - RAG-Based Campsite Concierge
 Intelligent chatbot for hyper-personalized camping trip planning

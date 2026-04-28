@@ -4,6 +4,11 @@ import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  server: {
+    host: 'localhost',
+    port: 5173,
+    open: true,
+  },
   build: {
     lib: {
       entry: resolve(__dirname, 'src/main.tsx'),
@@ -16,8 +21,5 @@ export default defineConfig({
         extend: true,
       },
     },
-  },
-  define: {
-    'process.env.NODE_ENV': JSON.stringify('production'),
   },
 });
