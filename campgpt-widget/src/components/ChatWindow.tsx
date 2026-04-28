@@ -19,7 +19,8 @@ export const ChatWindow = ({ onClose }: Props) => {
 
     try {
       const response = await sendMessage(input);
-      setMessages(prev => [...prev, { role: 'assistant', content: response }]);
+      console.log(response)
+      // setMessages(prev => [...prev, { role: 'assistant', content: response }]);
     } catch (e) {
       console.error(e);
     } finally {

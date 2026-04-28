@@ -30,3 +30,20 @@ if (document.readyState === 'complete') {
 } else {
   window.addEventListener('load', initWidget);
 }
+
+
+
+const bot = {
+  data: {},
+
+  init(config: any) {
+    initWidget();
+  },
+
+  setData(data: any) {
+    this.data = { ...this.data, ...data };
+    console.log("Injected data:", this.data);
+  }
+};
+
+window.MyChatbot = bot;

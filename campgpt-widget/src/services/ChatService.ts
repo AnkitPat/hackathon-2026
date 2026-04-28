@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:8000/chat'; // Default to local for now
+const API_URL = 'https://hackathon-2026-xnok.onrender.com/query'; // Default to local for now
 
 export interface Message {
   role: 'user' | 'assistant';
@@ -15,14 +15,15 @@ export const getSessionId = (): string => {
 };
 
 export const sendMessage = async (message: string): Promise<string> => {
-  const sessionId = getSessionId();
   const response = await fetch(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message, session_id: sessionId }),
+    body: JSON.stringify({
+      "question": message
+    }),
   });
 
   if (!response.ok) throw new Error('Failed to send message');
   const data = await response.json();
-  return data.response;
+  return data;
 };
