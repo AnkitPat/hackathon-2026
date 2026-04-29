@@ -70,6 +70,7 @@ class CampGPTRAG:
         self.temperature = temperature
         self.vectorstore = None
         self.qa_chain = None
+        self.prompt_template = None
         self.campsite_metadata = {}
         
         logger.info("Initializing CampGPT RAG system...")
@@ -99,7 +100,7 @@ class CampGPTRAG:
         Ingest campsite data from JSON file and create vector embeddings.
         
         Args:
-            json_file_path: Path to JSON file with campsite data
+            json_file_path: Path to JSON file with campsite data (single object or array of campsites)
             chunk_size: Size of text chunks for embedding
             chunk_overlap: Overlap between chunks
         """
@@ -111,136 +112,7 @@ class CampGPTRAG:
             logger.info(f"Loading data from {json_file_path}", data)
             
             # Flatten JSON into documents
-            documents = self._flatten_json_to_documents({
-    "id": "camp_001",
-    "name": "Sunny Valley Campsite",
-    "location": {
-      "country": "Netherlands",
-      "region": "Friesland",
-      "city": "Leeuwarden",
-      "coordinates": {
-        "latitude": 53.1234,
-        "longitude": 5.7890
-      }
-    },
-    "facilities": {
-      "toilets": {
-        "count": 12,
-        "wheelchair_accessible": "true",
-        "hot_showers": "true",
-        "accessible_showers": 3
-      },
-      "water": {
-        "drinking_water": "true",
-        "gray_water_disposal": "true",
-        "tap_locations": 8,
-        "water_quality": "Excellent"
-      },
-      "electricity": {
-        "available": "true",
-        "amps": 16,
-        "connection_points": 45,
-        "voltage": "230V"
-      },
-      "ev_charging": {
-        "available": "true",
-        "charging_points": 3,
-        "charging_speed": "7kW",
-        "connector_types": ["Type 2", "CCS"]
-      }
-    },
-    "rules": {
-      "quiet_hours": {
-        "start": "22:00",
-        "end": "08:00"
-      },
-      "pets": {
-        "allowed": "true",
-        "restrictions": "Well-behaved pets only. Additional €5/night",
-        "dog_park": "true",
-        "dogs_allowed_in_facilities": "false"
-      },
-      "vehicles": {
-        "max_height": "3.5m",
-        "max_length": "7.5m",
-        "electric_vehicles": "Encouraged with dedicated charging",
-        "speed_limit": "5 km/h"
-      }
-    },
-    "reviews": [
-      {
-        "rating": 4.8,
-        "comment": "Excellent cleanliness. Staff very attentive to accessibility needs. Perfect for elderly guests.",
-        "verified": "true",
-        "date": "2024-03-15"
-      },
-      {
-        "rating": 4.5,
-        "comment": "Food prices reasonable, but rides and slides cost extra. Fun for kids but budget accordingly.",
-        "verified": "true",
-        "date": "2024-03-10"
-      },
-      {
-        "rating": 4.9,
-        "comment": "Perfect for families with elderly members. Ramps everywhere, accessible toilets very clean.",
-        "verified": "true",
-        "date": "2024-02-28"
-      },
-      {
-        "rating": 4.7,
-        "comment": "EV charging works great. We charged our Tesla overnight without issues.",
-        "verified": "true",
-        "date": "2024-02-20"
-      },
-      {
-        "rating": 4.7,
-        "comment": "I have observed wifi extra cost of 5€",
-        "verified": "true",
-        "date": "2024-02-20"
-      },
-       {
-        "rating": 4.7,
-        "comment": "I have observed wifi extra cost of 10€",
-        "verified": "true",
-        "date": "2024-02-20"
-      }
-    ],
-    "accessibility": {
-      "wheelchair_accessible_pitches": 8,
-      "accessible_restaurants": "true",
-      "accessible_toilets": "true",
-      "accessible_showers": "true",
-      "ramps": "All main areas",
-      "disabled_parking": 6,
-      "accessible_paths": "Paved throughout campsite",
-      "elevator_to_main_building": "true",
-      "mobility_scooter_friendly": "true"
-    },
-    "amenities": {
-      "restaurants": 2,
-      "shops": 1,
-      "swimming_pool": "true",
-      "indoor_pool": "false",
-      "playground": "true",
-      "wifi": "true",
-      "wifi_speed": "50 Mbps",
-      "kids_club": "true",
-      "entertainment": "Evening shows 3x per week"
-    },
-    "extra_costs": {
-      "wifi": "€2.50/day",
-      "pool_entry": "€3/person (kids free)",
-      "kids_activities": "€5-10 per activity",
-      "slides": "€1.50 per slide",
-      "parking": "Included"
-    },
-    "proximity": {
-      "nearest_city": "Leeuwarden (8km)",
-      "nearest_beach": "20km",
-      "grocery_store": "1.5km",
-      "hospital": "5km"
-    }
-  })
+            documents = self._flatten_json_to_documents(data)
             logger.info(f"Extracted {len(documents)} document chunks from JSON")
             
             # Split text into chunks
@@ -282,13 +154,20 @@ class CampGPTRAG:
         Recursively flatten JSON data into Document objects.
         
         Args:
-            data: JSON data (dict, list, or scalar)
+            data: JSON data (dict, list of dicts, or scalar)
             parent_key: Parent key for metadata tracking
             
         Returns:
             List of Document objects with text content and metadata
         """
         documents = []
+        
+        # Handle array of campsites
+        if isinstance(data, list):
+            for item in data:
+                if isinstance(item, dict):
+                    documents.extend(self._flatten_json_to_documents(item, parent_key))
+            return documents
         
         if isinstance(data, dict):
             # Extract campsite name and metadata
@@ -377,7 +256,7 @@ class CampGPTRAG:
         return "\n".join(lines)
     
     def _create_qa_chain(self):
-        """Create RetrievalQA chain with custom prompt."""
+        """Initialize the prompt template for QA chain."""
         prompt_template = """You are CampGPT, an expert camping advisor.
 
 You have two sources of knowledge:
@@ -403,41 +282,65 @@ Question: {question}
 
 Answer:"""
         
-        PROMPT = PromptTemplate(
+        self.prompt_template = PromptTemplate(
             template=prompt_template,
             input_variables=["context", "question"]
         )
         
-        self.qa_chain = RetrievalQA.from_chain_type(
-            llm=self.llm,
-            chain_type="stuff",
-            retriever=self.vectorstore.as_retriever(
-                search_type="similarity",
-                search_kwargs={"k": 5}  # Retrieve top 5 relevant chunks
-            ),
-            return_source_documents=True,
-            chain_type_kwargs={"prompt": PROMPT}
+        logger.info("✓ Prompt template initialized successfully")
+    
+    def _create_qa_chain_with_filter(self, campsite_id: Optional[str] = None) -> RetrievalQA:
+        """Create RetrievalQA chain with optional campsite_id filter.
+        
+        Args:
+            campsite_id: Optional campsite ID to filter results. If None, retrieves from all campsites.
+            
+        Returns:
+            RetrievalQA chain with the specified filter
+        """
+        # Build filter dictionary if campsite_id is provided
+        search_kwargs = {"k": 5}
+        if campsite_id:
+            search_kwargs["filter"] = {"campsite_id": campsite_id}
+        
+        # Create retriever with optional filter
+        retriever = self.vectorstore.as_retriever(
+            search_type="similarity",
+            search_kwargs=search_kwargs
         )
         
-        logger.info("✓ QA chain created successfully")
+        # Create and return QA chain
+        qa_chain = RetrievalQA.from_chain_type(
+            llm=self.llm,
+            chain_type="stuff",
+            retriever=retriever,
+            return_source_documents=True,
+            chain_type_kwargs={"prompt": self.prompt_template}
+        )
+        
+        return qa_chain
     
-    def query(self, question: str, use_context: bool = "true") -> Dict[str, Any]:
+    def query(self, question: str, campsite_id: Optional[str] = None, use_context: bool = "true") -> Dict[str, Any]:
         """
         Query the RAG system with a camping-related question.
         
         Args:
             question: User question about the campsite
+            campsite_id: Optional campsite ID to filter results. If None, searches all campsites.
             use_context: Whether to return source documents
             
         Returns:
             Dictionary with answer and metadata
         """
-        if not self.qa_chain:
-            raise ValueError("QA chain not initialized. Call ingest_json_data first.")
+        if not self.vectorstore or not self.prompt_template:
+            raise ValueError("RAG system not initialized. Call ingest_json_data first.")
         
         try:
-            logger.info(f"Processing query: {question}")
-            result = self.qa_chain.invoke({"query": question})
+            logger.info(f"Processing query: {question}" + (f" for campsite: {campsite_id}" if campsite_id else " (all campsites)"))
+            
+            # Create QA chain with optional campsite filter
+            qa_chain = self._create_qa_chain_with_filter(campsite_id)
+            result = qa_chain.invoke({"query": question})
             
             response = {
                 "answer": result.get("result", ""),
@@ -465,22 +368,23 @@ Answer:"""
                 "success": "false"
             }
     
-    def batch_query(self, questions: List[str]) -> List[Dict[str, Any]]:
+    def batch_query(self, questions: List[str], campsite_id: Optional[str] = None) -> List[Dict[str, Any]]:
         """
         Process multiple questions in batch.
         
         Args:
             questions: List of questions
+            campsite_id: Optional campsite ID to filter results. If None, searches all campsites.
             
         Returns:
             List of response dictionaries
         """
-        logger.info(f"Processing batch of {len(questions)} questions")
+        logger.info(f"Processing batch of {len(questions)} questions" + (f" for campsite: {campsite_id}" if campsite_id else " (all campsites)"))
         results = []
         
         for i, question in enumerate(questions, 1):
             logger.info(f"Processing question {i}/{len(questions)}")
-            result = self.query(question)
+            result = self.query(question, campsite_id=campsite_id)
             results.append(result)
         
         return results
@@ -511,99 +415,173 @@ Answer:"""
 
 # Example usage and helper functions
 def create_sample_campsite_json() -> str:
-    """Create a sample campsite JSON file for testing."""
-    sample_data = {
-        "id": "camp_001",
-        "name": "Sunny Valley Campsite",
-        "location": {
-            "country": "Netherlands",
-            "region": "Friesland",
-            "coordinates": {
-                "latitude": 53.1234,
-                "longitude": 5.7890
+    """Create a sample campsite JSON file with array of campsites for testing."""
+    sample_data = [
+        {
+            "id": "camp_001",
+            "name": "Sunny Valley Campsite",
+            "location": {
+                "country": "Netherlands",
+                "region": "Friesland",
+                "coordinates": {
+                    "latitude": 53.1234,
+                    "longitude": 5.7890
+                }
+            },
+            "facilities": {
+                "toilets": {
+                    "count": 12,
+                    "wheelchair_accessible": "true",
+                    "hot_showers": "true"
+                },
+                "water": {
+                    "drinking_water": "true",
+                    "gray_water_disposal": "true",
+                    "tap_locations": 8
+                },
+                "electricity": {
+                    "available": "true",
+                    "amps": 16,
+                    "connection_points": 45
+                },
+                "ev_charging": {
+                    "available": "true",
+                    "charging_points": 3,
+                    "charging_speed": "7kW"
+                }
+            },
+            "rules": {
+                "quiet_hours": {
+                    "start": "22:00",
+                    "end": "08:00"
+                },
+                "pets": {
+                    "allowed": "true",
+                    "restrictions": "Well-behaved pets only. Additional €5/night",
+                    "dog_park": "true"
+                },
+                "vehicles": {
+                    "max_height": "3.5m",
+                    "max_length": "7.5m",
+                    "electric_vehicles": "Encouraged with dedicated charging"
+                }
+            },
+            "reviews": [
+                {
+                    "rating": 4.8,
+                    "comment": "Excellent cleanliness. Staff very attentive to accessibility needs.",
+                    "verified": "true"
+                },
+                {
+                    "rating": 4.5,
+                    "comment": "Food prices reasonable, but rides and slides cost extra.",
+                    "verified": "true"
+                },
+                {
+                    "rating": 4.9,
+                    "comment": "Perfect for families with elderly members. Ramps everywhere.",
+                    "verified": "true"
+                },
+                {
+                    "rating": 4.7,
+                    "comment": "I have observed wifi extra cost of 5€",
+                    "date": "2024-02-20"
+                }
+            ],
+            "accessibility": {
+                "wheelchair_accessible_pitches": 8,
+                "accessible_restaurants": "true",
+                "accessible_toilets": "true",
+                "ramps": "All main areas",
+                "disabled_parking": 6
+            },
+            "amenities": {
+                "restaurants": 2,
+                "shops": 1,
+                "swimming_pool": "true",
+                "playground": "true",
+                "wifi": "true"
             }
         },
-        "facilities": {
-            "toilets": {
-                "count": 12,
-                "wheelchair_accessible": "true",
-                "hot_showers": "true"
+        {
+            "id": "camp_002",
+            "name": "Forest Retreat Campsite",
+            "location": {
+                "country": "Netherlands",
+                "region": "North Holland",
+                "coordinates": {
+                    "latitude": 52.5234,
+                    "longitude": 5.2890
+                }
             },
-            "water": {
-                "drinking_water": "true",
-                "gray_water_disposal": "true",
-                "tap_locations": 8
+            "facilities": {
+                "toilets": {
+                    "count": 8,
+                    "wheelchair_accessible": "true",
+                    "hot_showers": "true"
+                },
+                "water": {
+                    "drinking_water": "true",
+                    "gray_water_disposal": "true",
+                    "tap_locations": 6
+                },
+                "electricity": {
+                    "available": "true",
+                    "amps": 16,
+                    "connection_points": 30
+                },
+                "ev_charging": {
+                    "available": "false"
+                }
             },
-            "electricity": {
-                "available": "true",
-                "amps": 16,
-                "connection_points": 45
+            "rules": {
+                "quiet_hours": {
+                    "start": "22:00",
+                    "end": "08:00"
+                },
+                "pets": {
+                    "allowed": "true",
+                    "restrictions": "Dogs welcome",
+                    "dog_park": "false"
+                },
+                "vehicles": {
+                    "max_height": "3.5m",
+                    "max_length": "7.5m"
+                }
             },
-            "ev_charging": {
-                "available": "true",
-                "charging_points": 3,
-                "charging_speed": "7kW"
+            "reviews": [
+                {
+                    "rating": 4.6,
+                    "comment": "Beautiful forest location. Great hiking trails nearby.",
+                    "verified": "true"
+                },
+                {
+                    "rating": 4.4,
+                    "comment": "Peaceful and quiet, perfect for nature lovers.",
+                    "verified": "true"
+                }
+            ],
+            "accessibility": {
+                "wheelchair_accessible_pitches": 4,
+                "accessible_toilets": "true",
+                "ramps": "Main areas only",
+                "disabled_parking": 2
+            },
+            "amenities": {
+                "restaurants": 1,
+                "shops": 0,
+                "swimming_pool": "false",
+                "playground": "true",
+                "wifi": "true"
             }
-        },
-        "rules": {
-            "quiet_hours": {
-                "start": "22:00",
-                "end": "08:00"
-            },
-            "pets": {
-                "allowed": "true",
-                "restrictions": "Well-behaved pets only. Additional €5/night",
-                "dog_park": "true"
-            },
-            "vehicles": {
-                "max_height": "3.5m",
-                "max_length": "7.5m",
-                "electric_vehicles": "Encouraged with dedicated charging"
-            }
-        },
-        "reviews": [
-            {
-                "rating": 4.8,
-                "comment": "Excellent cleanliness. Staff very attentive to accessibility needs.",
-                "verified": "true"
-            },
-            {
-                "rating": 4.5,
-                "comment": "Food prices reasonable, but rides and slides cost extra.",
-                "verified": "true"
-            },
-            {
-                "rating": 4.9,
-                "comment": "Perfect for families with elderly members. Ramps everywhere.",
-                "verified": "true"
-            },
-             {
-        "rating": 4.7,
-        "comment": "I have observed wifi extra cost of 5€",
-        "date": "2024-02-20"
-      }
-        ],
-        "accessibility": {
-            "wheelchair_accessible_pitches": 8,
-            "accessible_restaurants": "true",
-            "accessible_toilets": "true",
-            "ramps": "All main areas",
-            "disabled_parking": 6
-        },
-        "amenities": {
-            "restaurants": 2,
-            "shops": 1,
-            "swimming_pool": "true",
-            "playground": "true",
-            "wifi": "true"
         }
-    }
+    ]
     
-    json_path = "/home/claude/sample_campsite.json"
+    json_path = "/home/claude/sample_campsites.json"
     with open(json_path, 'w') as f:
         json.dump(sample_data, f, indent=2)
     
-    logger.info(f"Sample JSON created at {json_path}")
+    logger.info(f"Sample JSON with {len(sample_data)} campsites created at {json_path}")
     return json_path
 
 
@@ -622,7 +600,7 @@ if __name__ == "__main__":
     # Ingest data
     rag.ingest_json_data(json_path)
     
-    # Example queries
+    # Example queries - search across all campsites
     queries = [
         "Is this site safe for my 70-year-old father who uses a walker?",
         "Can we bring our electric car and charge it here?",
@@ -631,12 +609,30 @@ if __name__ == "__main__":
         "How many wheelchair-accessible pitches do you have?"
     ]
     
-    print("\nProcessing sample queries:")
+    print("\nProcessing queries across ALL campsites:")
     print("-" * 80)
     
     for query in queries:
         print(f"\nQ: {query}")
         response = rag.query(query)
+        print(f"A: {response['answer']}")
+        if response.get('sources'):
+            print(f"Sources: {len(response['sources'])} document(s) used")
+    
+    # Example queries - specific campsite
+    print("\n\n" + "=" * 80)
+    print("Processing queries for SPECIFIC CAMPSITE (camp_001):")
+    print("=" * 80)
+    
+    specific_queries = [
+        "What facilities does this campsite have?",
+        "Is there EV charging available?",
+        "Are pets allowed?"
+    ]
+    
+    for query in specific_queries:
+        print(f"\nQ: {query}")
+        response = rag.query(query, campsite_id="camp_001")
         print(f"A: {response['answer']}")
         if response.get('sources'):
             print(f"Sources: {len(response['sources'])} document(s) used")
