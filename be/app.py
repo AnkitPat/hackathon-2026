@@ -20,6 +20,7 @@ rag = None
 # Request schema
 class QueryRequest(BaseModel):
     question: str
+    campsiteId: str
 
 
 @app.on_event("startup")
@@ -48,8 +49,8 @@ def health():
 @app.post("/query")
 def query_rag(request: QueryRequest):
     global rag
-
-    result = rag.query(request.question)
+    
+    result = rag.query(request.question, request.campsiteId)
 
     return {
         "answer": result["answer"],
